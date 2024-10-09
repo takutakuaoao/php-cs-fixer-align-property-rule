@@ -2,20 +2,20 @@
 
 namespace Tests\Units;
 
-use PhpCsFixer\Fixer\Alias\ArrayPushFixer;
+use PhpCsFixer\Fixer\Alias\ArrayPushFixer as SampleFixer;
 use PhpCsFixer\Tokenizer\Tokens;
 use PHPUnit\Framework\TestCase;
 
 class LearningFixerTest extends TestCase
 {
-    private ArrayPushFixer $fixer;
+    private SampleFixer $fixer;
     private \SplFileInfo $mockFile;
 
     public function setUp(): void
     {
         Tokens::clearCache();
 
-        $this->fixer    = new ArrayPushFixer();
+        $this->fixer    = new SampleFixer();
         $this->mockFile = new \SplFileInfo(__FILE__);
     }
 
