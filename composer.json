@@ -1,0 +1,17 @@
+{
+    "name": "takutakuaoao/php-cs-fixer-align-property-rule",
+    "description": "the cs-fixer-rule making class properties align.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "PhpCsFixerAlignPropertyRule\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "takuya.aotsuka"
+        }
+    ],
+    "require": {}
+}
