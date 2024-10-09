@@ -8,6 +8,12 @@
             "PhpCsFixerAlignPropertyRule\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Units\\": "tests/units",
+            "Tests\\Fixtures\\": "tests/_fixtures"
+        }
+    },
     "authors": [
         {
             "name": "takuya.aotsuka"
@@ -20,5 +26,10 @@
         "phpunit/phpunit": "^10.5",
         "phpstan/phpstan": "^1.12",
         "friendsofphp/php-cs-fixer": "^3.64"
+    },
+    "scripts": {
+        "test": [
+            "vendor/bin/phpunit tests --colors=always"
+        ]
     }
 }
