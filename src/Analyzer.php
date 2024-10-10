@@ -6,73 +6,35 @@ namespace PhpCsFixerAlignPropertyRule;
 
 class Analyzer
 {
-    private TablePosition $currentPosition;
-
     /**
      * @param array<array<string>> $rows
      */
     public static function init(array $rows): self
     {
-        $result = array_map(function ($row) {
-            return array_map(function ($text) {
-                return TextToken::init($text);
-            }, $row);
-        }, $rows);
-
-        return new self($result);
+        return new self(TextTokenTable::init($rows));
     }
 
-    /**
-     * @param array<array<TextToken>> $rows
-     */
-    public function __construct(private array $rows)
+    public function __construct(private TextTokenTable $table)
     {
-        $this->currentPosition = TablePosition::init();
     }
 
-    public function markAsRequiringAlign(): self
+    public function markAsRequiringAlign(): TextTokenTable
     {
-        foreach ($this->rows as $rowIndex => $row) {
-            foreach ($row as $columnIndex => $currentToken) {
-                $this->updateCurrentPosition((int) $rowIndex, (int) $columnIndex);
-
-                if ($this->isMarkAsRequiredAlign()) {
-                    $this->updateCurrentToken($currentToken->markAsRequiredAlign());
-                }
+        $this->table->loop(function (TablePosition $current, TextToken $token) {
+            if ($this->isMarkAsRequiredAlign($current)) {
+                $this->table = $this->table->updateToken($current, $token->markAsRequiredAlign());
             }
-        }
+        });
 
-        return $this;
+        return $this->table;
     }
 
-    private function updateCurrentPosition(int $row, int $column): void
+    private function isMarkAsRequiredAlign(TablePosition $position): bool
     {
-        $this->currentPosition = $this->currentPosition->update($row, $column);
-    }
-
-    private function updateCurrentToken(TextToken $updatedTextToken): void
-    {
-        $current                                         = $this->currentPosition->toArray();
-        $this->rows[$current['row']][$current['column']] = $updatedTextToken;
-    }
-
-    private function isMarkAsRequiredAlign(): bool
-    {
-        return $this->findText($this->currentPosition->right())
+        return $this->table->findToken($position->right())
             && (
-                $this->findText($this->currentPosition->bottom())
-                || $this->findText($this->currentPosition->top())
+                $this->table->findToken($position->bottom())
+                || $this->table->findToken($position->top())
             );
-    }
-
-    public function findText(TablePosition $position): ?TextToken
-    {
-        $arrPosition = $position->toArray();
-
-        if (isset($this->rows[$arrPosition['row']][$arrPosition['column']])) {
-            return $this->rows[$arrPosition['row']][$arrPosition['column']];
-        }
-
-        return null;
     }
 }

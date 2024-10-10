@@ -5,6 +5,7 @@ namespace Tests\Units;
 use PhpCsFixerAlignPropertyRule\Analyzer;
 use PhpCsFixerAlignPropertyRule\TablePosition;
 use PhpCsFixerAlignPropertyRule\TextToken;
+use PhpCsFixerAlignPropertyRule\TextTokenTable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -93,11 +94,11 @@ class AnalyzerTest extends BaseTestCase
     /**
      * @param array{row: int, column: int} $position
      */
-    private function findTarget(Analyzer $actual, array $position): ?TextToken
+    private function findTarget(TextTokenTable $actual, array $position): ?TextToken
     {
         $pos = TablePosition::fromArray($position);
 
-        return $actual->findText($pos);
+        return $actual->findToken($pos);
     }
 }
 
@@ -117,9 +118,9 @@ class ExpectedMarkedText
     ) {
     }
 
-    public function assertAlignMarked(Analyzer $actual): void
+    public function assertAlignMarked(TextTokenTable $actual): void
     {
-        $text = $actual->findText($this->targetPosition->toTablePosition());
+        $text = $actual->findToken($this->targetPosition->toTablePosition());
 
         TestCase::assertEquals($text?->mustAlign, $this->mustAlign);
     }
