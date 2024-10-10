@@ -6,17 +6,15 @@ namespace PhpCsFixerAlignPropertyRule;
 
 class Aligner
 {
-    public static function init(string ...$text): self
+    public static function initFromToken(TextToken ...$text): self
     {
-        return new Aligner(array_map(function ($item) {
-            return Text::init($item);
-        }, $text));
+        return new Aligner($text);
     }
 
     /**
-     * @param array<Text> $textList
+     * @param array<TextToken> $alignableList
      */
-    public function __construct(private array $textList)
+    public function __construct(private array $alignableList)
     {
     }
 
@@ -24,39 +22,42 @@ class Aligner
     {
         $max = $this->getMaxLettersNumber();
 
-        $result = array_map(function (Text $item) use ($max) {
+        $result = array_map(function (TextToken $item) use ($max) {
             return $item->fillIn($max);
-        }, $this->textList);
+        }, $this->alignableList);
 
         return new self($result);
     }
 
     public function getMaxLettersNumber(): int
     {
-        $textsLength = array_map(function (Text $item): int {
+        $textsLength = array_map(function (TextToken $item): int {
             return $item->length();
-        }, $this->textList);
+        }, $this->alignableList);
 
         return (int) max($textsLength);
     }
 
-    public function equal(self $other): bool
+    public function replaceToTokenTable(TextTokenTable $table): TextTokenTable
     {
-        if ($this->size() !== $other->size()) {
-            return false;
+        foreach ($this->alignableList as $token) {
+            $table = $table->updateToken($token);
         }
 
-        for ($i = 0; $i < $this->size(); ++$i) {
-            if (!$this->textList[$i]->equal($other->textList[$i])) {
+        return $table;
+    }
+
+    /**
+     * @param array<string> $texts
+     */
+    public function hasTexts(array $texts): bool
+    {
+        foreach ($this->alignableList as $key => $token) {
+            if (!$token->hasText($texts[$key])) {
                 return false;
             }
         }
 
         return true;
-    }
-
-    private function size(): int
-    {
-        return count($this->textList);
     }
 }

@@ -17,8 +17,26 @@ class TextToken
     public function __construct(
         private Text $text,
         public readonly bool $mustAlign,
-        private readonly TablePosition $originalPosition,
+        public readonly TablePosition $originalPosition,
     ) {
+    }
+
+    public function fillIn(int $maxLettersNumber, string $space = ' '): TextToken
+    {
+        if (!$this->mustAlign) {
+            return $this;
+        }
+
+        return new TextToken(
+            $this->text->fillIn($maxLettersNumber, $space),
+            $this->mustAlign,
+            $this->originalPosition
+        );
+    }
+
+    public function length(): int
+    {
+        return $this->text->length();
     }
 
     public function markAsRequiredAlign(): self
@@ -29,5 +47,10 @@ class TextToken
     public function hasText(string $text): bool
     {
         return $this->text->equal(Text::init($text));
+    }
+
+    public function toString(): string
+    {
+        return $this->text->toString();
     }
 }

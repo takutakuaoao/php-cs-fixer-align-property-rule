@@ -15,17 +15,12 @@ class Text
     {
     }
 
-    public function get(): string
-    {
-        return $this->text;
-    }
-
     public function length(): int
     {
         return mb_strlen($this->text);
     }
 
-    public function fillIn(int $maxLettersNumber, string $space = ' '): self
+    public function fillIn(int $maxLettersNumber, string $space = ' '): Text
     {
         $result = mb_str_pad($this->text, $maxLettersNumber, $space);
 
@@ -35,5 +30,10 @@ class Text
     public function equal(Text $other): bool
     {
         return $this->text === $other->text;
+    }
+
+    public function toString(): string
+    {
+        return $this->text;
     }
 }
