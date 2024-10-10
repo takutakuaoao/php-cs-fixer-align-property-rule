@@ -81,14 +81,14 @@ class AnalyzerTest extends BaseTestCase
 
         $result = $analyzer->markAsRequiringAlign();
 
-        $this->assertTrue($this->findTarget($result, ['row' => 0, 'column' => 0])?->mustAlign);
-        $this->assertTrue($this->findTarget($result, ['row' => 1, 'column' => 0])?->mustAlign);
-        $this->assertTrue($this->findTarget($result, ['row' => 2, 'column' => 0])?->mustAlign);
-        $this->assertTrue($this->findTarget($result, ['row' => 2, 'column' => 1])?->mustAlign);
+        $this->assertTrue($this->findTarget($result, ['row' => 0, 'column' => 0])?->isMustAlign());
+        $this->assertTrue($this->findTarget($result, ['row' => 1, 'column' => 0])?->isMustAlign());
+        $this->assertTrue($this->findTarget($result, ['row' => 2, 'column' => 0])?->isMustAlign());
+        $this->assertTrue($this->findTarget($result, ['row' => 2, 'column' => 1])?->isMustAlign());
 
-        $this->assertFalse($this->findTarget($result, ['row' => 0, 'column' => 1])?->mustAlign);
-        $this->assertFalse($this->findTarget($result, ['row' => 1, 'column' => 1])?->mustAlign);
-        $this->assertFalse($this->findTarget($result, ['row' => 2, 'column' => 2])?->mustAlign);
+        $this->assertFalse($this->findTarget($result, ['row' => 0, 'column' => 1])?->isMustAlign());
+        $this->assertFalse($this->findTarget($result, ['row' => 1, 'column' => 1])?->isMustAlign());
+        $this->assertFalse($this->findTarget($result, ['row' => 2, 'column' => 2])?->isMustAlign());
     }
 
     /**
@@ -122,7 +122,7 @@ class ExpectedMarkedText
     {
         $text = $actual->findToken($this->targetPosition->toTablePosition());
 
-        TestCase::assertEquals($text?->mustAlign, $this->mustAlign);
+        TestCase::assertEquals($text?->isMustAlign(), $this->mustAlign);
     }
 }
 

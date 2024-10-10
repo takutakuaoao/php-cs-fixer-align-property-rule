@@ -44,13 +44,33 @@ class TablePosition
     }
 
     /**
-     * @return array{row: int, column: int}
+     * @template T
+     *
+     * @param array<array<T>> $list
+     * @param T               $item
+     *
+     * @return array<array<T>>
      */
-    public function toArray(): array
+    public function apply(array $list, mixed $item): array
     {
-        return [
-            'row'    => $this->row,
-            'column' => $this->column,
-        ];
+        $list[$this->row][$this->column] = $item;
+
+        return $list;
+    }
+
+    /**
+     * @template T
+     *
+     * @param array<array<T>> $table
+     *
+     * @return T|null
+     */
+    public function pull(array $table): mixed
+    {
+        if (isset($table[$this->row][$this->column])) {
+            return $table[$this->row][$this->column];
+        }
+
+        return null;
     }
 }

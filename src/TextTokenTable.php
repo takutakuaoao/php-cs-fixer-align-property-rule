@@ -29,23 +29,14 @@ class TextTokenTable
 
     public function updateToken(TextToken $updated): self
     {
-        $rows = $this->rows;
-        $pos  = $updated->originalPosition->toArray();
-
-        $rows[$pos['row']][$pos['column']] = $updated;
+        $rows = $updated->insertSelfTo($this->rows);
 
         return new self($rows);
     }
 
     public function findToken(TablePosition $tablePosition): ?TextToken
     {
-        $pos = $tablePosition->toArray();
-
-        if (isset($this->rows[$pos['row']][$pos['column']])) {
-            return $this->rows[$pos['row']][$pos['column']];
-        }
-
-        return null;
+        return $tablePosition->pull($this->rows);
     }
 
     /**
