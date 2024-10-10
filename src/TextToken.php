@@ -16,8 +16,8 @@ class TextToken
 
     public function __construct(
         private Text $text,
-        public readonly bool $mustAlign,
-        public readonly TablePosition $originalPosition,
+        private bool $mustAlign,
+        private TablePosition $originalPosition,
     ) {
     }
 
@@ -49,8 +49,23 @@ class TextToken
         return $this->text->equal(Text::init($text));
     }
 
+    /**
+     * @param array<array<TextToken>> $table
+     *
+     * @return array<array<TextToken>>
+     */
+    public function insertSelfTo(array $table): array
+    {
+        return $this->originalPosition->apply($table, $this);
+    }
+
     public function toString(): string
     {
         return $this->text->toString();
+    }
+
+    public function isMustAlign(): bool
+    {
+        return $this->mustAlign;
     }
 }
