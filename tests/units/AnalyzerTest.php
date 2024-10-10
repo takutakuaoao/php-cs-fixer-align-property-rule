@@ -4,6 +4,8 @@ namespace Tests\Units;
 
 use PhpCsFixerAlignPropertyRule\Analyzer;
 use PhpCsFixerAlignPropertyRule\TablePosition;
+use PhpCsFixerAlignPropertyRule\TextToken;
+use PhpCsFixerAlignPropertyRule\TextTokenTable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -68,6 +70,36 @@ class AnalyzerTest extends BaseTestCase
             ],
         ];
     }
+
+    public function test_confirm_that_multiple_texts_are_marked(): void
+    {
+        $analyzer = Analyzer::init([
+            ['check:pos:0-0', 'not-check:pos:0-1'],
+            ['check:pos:1-0', 'not-check:pos:1-1'],
+            ['check:pos:2-0', 'check:pos:2-1', 'not-check:pos:2-2'],
+        ]);
+
+        $result = $analyzer->markAsRequiringAlign();
+
+        $this->assertTrue($this->findTarget($result, ['row' => 0, 'column' => 0])?->mustAlign);
+        $this->assertTrue($this->findTarget($result, ['row' => 1, 'column' => 0])?->mustAlign);
+        $this->assertTrue($this->findTarget($result, ['row' => 2, 'column' => 0])?->mustAlign);
+        $this->assertTrue($this->findTarget($result, ['row' => 2, 'column' => 1])?->mustAlign);
+
+        $this->assertFalse($this->findTarget($result, ['row' => 0, 'column' => 1])?->mustAlign);
+        $this->assertFalse($this->findTarget($result, ['row' => 1, 'column' => 1])?->mustAlign);
+        $this->assertFalse($this->findTarget($result, ['row' => 2, 'column' => 2])?->mustAlign);
+    }
+
+    /**
+     * @param array{row: int, column: int} $position
+     */
+    private function findTarget(TextTokenTable $actual, array $position): ?TextToken
+    {
+        $pos = TablePosition::fromArray($position);
+
+        return $actual->findToken($pos);
+    }
 }
 
 class ExpectedMarkedText
@@ -86,9 +118,9 @@ class ExpectedMarkedText
     ) {
     }
 
-    public function assertAlignMarked(Analyzer $actual): void
+    public function assertAlignMarked(TextTokenTable $actual): void
     {
-        $text = $actual->findText($this->targetPosition->toTablePosition());
+        $text = $actual->findToken($this->targetPosition->toTablePosition());
 
         TestCase::assertEquals($text?->mustAlign, $this->mustAlign);
     }
