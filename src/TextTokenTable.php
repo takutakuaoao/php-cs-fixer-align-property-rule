@@ -27,10 +27,10 @@ class TextTokenTable
     {
     }
 
-    public function updateToken(TablePosition $tablePosition, TextToken $updated): self
+    public function updateToken(TextToken $updated): self
     {
         $rows = $this->rows;
-        $pos  = $tablePosition->toArray();
+        $pos  = $updated->originalPosition->toArray();
 
         $rows[$pos['row']][$pos['column']] = $updated;
 
@@ -125,5 +125,17 @@ class TextTokenTable
         }
 
         return [$result, $chunk];
+    }
+
+    /**
+     * @return array<array<string>>
+     */
+    public function toPlain(): array
+    {
+        return array_map(function (array $row) {
+            return array_map(function (TextToken $token) {
+                return $token->toString();
+            }, $row);
+        }, $this->rows);
     }
 }

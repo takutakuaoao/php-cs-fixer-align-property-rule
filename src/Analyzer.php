@@ -22,7 +22,7 @@ class Analyzer
     {
         $this->table->loop(function (TablePosition $current, TextToken $token) {
             if ($this->isMarkAsRequiredAlign($current)) {
-                $this->table = $this->table->updateToken($current, $token->markAsRequiredAlign());
+                $this->table = $this->table->updateToken($token->markAsRequiredAlign());
             }
         });
 
