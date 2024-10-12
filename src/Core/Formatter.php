@@ -9,7 +9,7 @@ class Formatter
     /**
      * @param array<array<string>> $rows
      */
-    public static function init(array $rows): self
+    public static function init(array|TextTokenTable $rows): self
     {
         return new self(Analyzer::init($rows));
     }
@@ -18,10 +18,7 @@ class Formatter
     {
     }
 
-    /**
-     * @return array<array<string>>
-     */
-    public function format(): array
+    public function format(): TextTokenTable
     {
         $tokenTable = $this->analyzer->markAsRequiringAlign();
         $chunk      = $tokenTable->chunkVerticalAll();
@@ -32,6 +29,6 @@ class Formatter
                 ->replaceToTokenTable($tokenTable);
         }
 
-        return $tokenTable->toPlain();
+        return $tokenTable;
     }
 }

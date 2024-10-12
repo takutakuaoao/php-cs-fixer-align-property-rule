@@ -9,9 +9,11 @@ class Analyzer
     /**
      * @param array<array<string>> $rows
      */
-    public static function init(array $rows): self
+    public static function init(array|TextTokenTable $rows): self
     {
-        return new self(TextTokenTable::fromArray($rows));
+        $table = is_array($rows) ? TextTokenTable::fromArray($rows) : $rows;
+
+        return new self($table);
     }
 
     public function __construct(private TextTokenTable $table)

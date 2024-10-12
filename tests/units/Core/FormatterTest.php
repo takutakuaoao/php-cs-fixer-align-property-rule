@@ -21,6 +21,6 @@ class FormatterTest extends TestCase
             ['private  ', 'string', '$stringProperty'],
             ['public   ', 'int   ', '$intProperty'],
             ['protected', 'bool  ', '$boolProperty'],
-        ], $result);
+        ], $result->toPlain());
     }
 }
