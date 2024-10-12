@@ -8,7 +8,9 @@ use PhpCsFixer\AbstractFixer;
 use PhpCsFixer\FixerDefinition\CodeSample;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
 use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
+use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
+use PhpCsFixerAlignPropertyRule\Core\Formatter;
 
 class AlignClassPropertiesFixer extends AbstractFixer
 {
@@ -21,13 +23,27 @@ class AlignClassPropertiesFixer extends AbstractFixer
     {
     }
 
+    public function getName(): string
+    {
+        return 'Takutakuaoao/align_class_properties';
+    }
+
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
+        $tokenTable = Parser::init($tokens)->parse();
+        $formatted  = Formatter::init($tokenTable)->format();
+
+        $formatted->loop(function ($_, $token) use ($tokens) {
+            if ($token->isMustAlign()) {
+                $tokens->offsetSet($token->index, new Token($token->toString()));
+                $tokens->offsetSet($token->index + 1, new Token(' '));
+            }
+        });
     }
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return false;
+        return $this->hasClassStatement($tokens);
     }
 
     public function getDefinition(): FixerDefinitionInterface
@@ -38,5 +54,42 @@ class AlignClassPropertiesFixer extends AbstractFixer
             null,
             '',
         );
+    }
+
+    public function hasClassStatement(Tokens $tokens): bool
+    {
+        foreach ($tokens as $index => $token) {
+            if ($token?->equals([T_CLASS, 'class'], true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasClassProperty(Tokens $tokens): bool
+    {
+        $hasProperty = false;
+
+        foreach ($tokens as $token) {
+            if ($this->isPropertyToken($token)) {
+                $hasProperty = true;
+            }
+        }
+
+        return $hasProperty;
+    }
+
+    private function isPropertyToken(?Token $token): bool
+    {
+        if (null === $token) {
+            return false;
+        }
+
+        return $token->equalsAny([
+            [T_PRIVATE, 'private'],
+            [T_PROTECTED, 'protected'],
+            [T_PUBLIC, 'public'],
+        ], true);
     }
 }
