@@ -165,6 +165,19 @@ class ParserTest extends BaseTestCase
                     [0, 3, 'true'],
                 ],
             ],
+            'multiple_property_keyword_with_value' => [
+                'code' => '<?php
+            class Test
+            {
+                private readonly $test;
+            }
+            ',
+                'expected' => [
+                    [0, 0, 'private'],
+                    [0, 1, 'readonly'],
+                    [0, 2, '$test'],
+                ],
+            ],
         ];
     }
 

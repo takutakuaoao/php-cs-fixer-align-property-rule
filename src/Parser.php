@@ -12,6 +12,7 @@ use PhpCsFixerAlignPropertyRule\Core\TextTokenTableBuilder;
 class Parser
 {
     private TextTokenTableBuilder $builder;
+    private bool $isParsingPropertySentence;
 
     public static function init(Tokens $tokens): self
     {
@@ -20,7 +21,8 @@ class Parser
 
     public function __construct(public Tokens $tokens)
     {
-        $this->builder = TextTokenTableBuilder::init();
+        $this->builder                   = TextTokenTableBuilder::init();
+        $this->isParsingPropertySentence = false;
     }
 
     public function parse(): TextTokenTable
@@ -30,57 +32,31 @@ class Parser
                 continue;
             }
 
-            if (
-                $this->isConstStatementToken($index, $token)
-                || $this->isPropertyStartToken($index, $token)
-                || $this->isPropertyVariableToken($index, $token)
-            ) {
-                $this->builder->addColumn($index, $token->getContent());
+            if ($this->isPropertyStartToken($index, $token)) {
+                $this->addColumn($index, $token);
+                continue;
+            }
+
+            if ($this->isParsingPropertySentence) {
+                if (TokenUtils::isClassPropertyCandidateToken($token)) {
+                    $this->addColumn($index, $token);
+                    continue;
+                }
             }
         }
 
         return $this->builder->build();
     }
 
-    private function isConstStatementToken(int $index, Token $token): bool
+    private function addColumn(int $index, Token $token): void
     {
-        if (TokenUtils::isConstValueSymbol($token)) {
-            return $this->isPrevTokenValidate($index, ['=', [T_STRING], TokenUtils::CONST_KEY_WORD_RULE]);
+        $this->builder->addColumn($index, $token->getContent());
+
+        $next = $this->tokens[$index + 1];
+
+        if (TokenUtils::isEndStatement($next)) {
+            $this->endPropertyParsing();
         }
-
-        if ($token->equals(TokenUtils::CONST_KEY_WORD_RULE)) {
-            return true;
-        }
-
-        if ('=' === $token->getContent()) {
-            return $this->isPrevTokenValidate($index, [[T_STRING], TokenUtils::CONST_KEY_WORD_RULE]);
-        }
-
-        if ($token->equals([T_STRING])) {
-            return $this->isPrevTokenValidate($index, [TokenUtils::CONST_KEY_WORD_RULE]);
-        }
-
-        return false;
-    }
-
-    /**
-     * @param array<array{0: int, 1?: string}|string> $conditions
-     */
-    private function isPrevTokenValidate(int $index, array $conditions): bool
-    {
-        if ([] === $conditions) {
-            return true;
-        }
-
-        $currentCondition = array_shift($conditions);
-
-        $prev = $this->tokens->getPrevNonWhitespace($index);
-
-        if ($prev && $this->tokens[$prev]->equals($currentCondition)) {
-            return $this->isPrevTokenValidate($prev, $conditions);
-        }
-
-        return false;
     }
 
     private function isPropertyStartToken(int $index, Token $token): bool
@@ -89,25 +65,34 @@ class Parser
             return false;
         }
 
-        $nextTokenIndex = $this->tokens->getNextNonWhitespace($index);
+        $prevToken = $this->tokens[$index - 1];
 
-        if (null === $nextTokenIndex || !$this->tokens[$nextTokenIndex]->equals([T_VARIABLE])) {
+        if (false === mb_strpos($prevToken->getContent(), "\n")) {
             return false;
         }
+
+        $nextIndex = $this->tokens->getNextNonWhitespace($index);
+
+        if (null === $nextIndex) {
+            return false;
+        }
+
+        if ($this->tokens[$nextIndex]->equals([T_FUNCTION])) {
+            return false;
+        }
+
+        $this->startPropertyParsing();
 
         return true;
     }
 
-    private function isPropertyVariableToken(int $index, Token $token): bool
+    private function startPropertyParsing(): void
     {
-        if ($token->equals([T_VARIABLE])) {
-            $prevIndex = $this->tokens->getPrevNonWhitespace($index);
+        $this->isParsingPropertySentence = true;
+    }
 
-            if ($prevIndex && $this->isPropertyStartToken($prevIndex, $this->tokens[$prevIndex])) {
-                return true;
-            }
-        }
-
-        return false;
+    private function endPropertyParsing(): void
+    {
+        $this->isParsingPropertySentence = false;
     }
 }
