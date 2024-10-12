@@ -2,8 +2,8 @@
 
 namespace Tests\Units;
 
-use PhpCsFixerAlignPropertyRule\TextToken;
-use PhpCsFixerAlignPropertyRule\TextTokenTable;
+use PhpCsFixerAlignPropertyRule\Core\TextToken;
+use PhpCsFixerAlignPropertyRule\Core\TextTokenTable;
 use PHPUnit\Framework\TestCase;
 
 class TextTokenTableTest extends TestCase
@@ -12,7 +12,7 @@ class TextTokenTableTest extends TestCase
 
     public function setUp(): void
     {
-        $this->table = TextTokenTable::init([
+        $this->table = TextTokenTable::fromArray([
             ['test'],
             ['test', 'chunk-1-1'],
             ['test'],
@@ -39,7 +39,7 @@ class TextTokenTableTest extends TestCase
 
     public function test_get_all_chunk_vertical(): void
     {
-        $table = TextTokenTable::init([
+        $table = TextTokenTable::fromArray([
             ['chunk-1-1', 'chunk-2-1'],
             ['chunk-1-2', 'chunk-2-2', 'chunk-4-1'],
             ['chunk-1-3'],

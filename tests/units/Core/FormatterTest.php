@@ -2,7 +2,7 @@
 
 namespace Tests\Units;
 
-use PhpCsFixerAlignPropertyRule\Formatter;
+use PhpCsFixerAlignPropertyRule\Core\Formatter;
 use PHPUnit\Framework\TestCase;
 
 class FormatterTest extends TestCase

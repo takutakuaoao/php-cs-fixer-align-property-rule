@@ -2,19 +2,22 @@
 
 declare(strict_types=1);
 
-namespace PhpCsFixerAlignPropertyRule;
+namespace PhpCsFixerAlignPropertyRule\Core;
 
 class TextToken
 {
     /**
-     * @param array{row: int, column: int} $position
+     * @param array{row: int, column: int}|TablePosition $position
      */
-    public static function init(string $text, array $position): self
+    public static function init(int $index, string $text, array|TablePosition $position): self
     {
-        return new self(Text::init($text), false, TablePosition::fromArray($position));
+        $position = is_array($position) ? TablePosition::fromArray($position) : $position;
+
+        return new self($index, Text::init($text), false, $position);
     }
 
     public function __construct(
+        public readonly int $index,
         private Text $text,
         private bool $mustAlign,
         private TablePosition $originalPosition,
@@ -28,6 +31,7 @@ class TextToken
         }
 
         return new TextToken(
+            $this->index,
             $this->text->fillIn($maxLettersNumber, $space),
             $this->mustAlign,
             $this->originalPosition
@@ -41,7 +45,7 @@ class TextToken
 
     public function markAsRequiredAlign(): self
     {
-        return new self($this->text, true, $this->originalPosition);
+        return new self($this->index, $this->text, true, $this->originalPosition);
     }
 
     public function hasText(string $text): bool

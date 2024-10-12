@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpCsFixerAlignPropertyRule;
+namespace PhpCsFixerAlignPropertyRule\Core;
 
 class Analyzer
 {
@@ -11,7 +11,7 @@ class Analyzer
      */
     public static function init(array $rows): self
     {
-        return new self(TextTokenTable::init($rows));
+        return new self(TextTokenTable::fromArray($rows));
     }
 
     public function __construct(private TextTokenTable $table)

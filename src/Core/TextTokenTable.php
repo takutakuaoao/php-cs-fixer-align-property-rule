@@ -2,22 +2,30 @@
 
 declare(strict_types=1);
 
-namespace PhpCsFixerAlignPropertyRule;
+namespace PhpCsFixerAlignPropertyRule\Core;
 
 class TextTokenTable
 {
     /**
      * @param array<array<string>> $rows
      */
-    public static function init(array $rows): self
+    public static function fromArray(array $rows): self
     {
         $result = array_map(function ($row, $rowIndex) {
             return array_map(function ($text, $columnIndex) use ($rowIndex) {
-                return TextToken::init($text, ['row' => $rowIndex, 'column' => $columnIndex]);
+                return TextToken::init((int) $columnIndex, $text, ['row' => $rowIndex, 'column' => $columnIndex]);
             }, $row, range(0, count($row) - 1));
         }, $rows, range(0, count($rows) - 1));
 
         return new self($result);
+    }
+
+    /**
+     * @param array<array<TextToken>> $rows
+     */
+    public static function init(array $rows): self
+    {
+        return new self($rows);
     }
 
     /**
@@ -128,5 +136,18 @@ class TextTokenTable
                 return $token->toString();
             }, $row);
         }, $this->rows);
+    }
+
+    public function getAllItemCount(): int
+    {
+        $result = [];
+
+        foreach ($this->rows as $row) {
+            foreach ($row as $column) {
+                $result[] = $column;
+            }
+        }
+
+        return count($result);
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpCsFixerAlignPropertyRule;
+namespace PhpCsFixerAlignPropertyRule\Core;
 
 class Aligner
 {
