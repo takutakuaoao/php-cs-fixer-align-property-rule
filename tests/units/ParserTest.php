@@ -178,6 +178,54 @@ class ParserTest extends BaseTestCase
                     [0, 2, '$test'],
                 ],
             ],
+            'type_keyword_in_property_sentence' => [
+                'code' => '<?php
+            class Test
+            {
+                private SampleClass $test;
+            }
+            ',
+                'expected' => [
+                    [0, 0, 'private'],
+                    [0, 1, 'SampleClass'],
+                    [0, 2, '$test'],
+                ],
+            ],
+            'set_default_value' => [
+                'code' => '<?php
+            class Test
+            {
+                private string $test = "default-value";
+            }
+            ',
+                'expected' => [
+                    [0, 0, 'private'],
+                    [0, 1, 'string'],
+                    [0, 2, '$test'],
+                    [0, 3, '='],
+                    [0, 4, '"default-value"'],
+                ],
+            ],
+            'multiple_property_sentences' => [
+                'code' => '<?php
+            class Test
+            {
+                private string $test;
+                readonly public int $test_2 = 10;
+            }
+                ',
+                'expected' => [
+                    [0, 0, 'private'],
+                    [0, 1, 'string'],
+                    [0, 2, '$test'],
+                    [1, 0, 'readonly'],
+                    [1, 1, 'public'],
+                    [1, 2, 'int'],
+                    [1, 3, '$test_2'],
+                    [1, 4, '='],
+                    [1, 5, '10'],
+                ],
+            ],
         ];
     }
 

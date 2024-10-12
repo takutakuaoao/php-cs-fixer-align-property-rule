@@ -8,17 +8,6 @@ use PhpCsFixer\Tokenizer\Token;
 
 class TokenUtils
 {
-    private const CLASS_PROPERTY_CANDIDATE_RULE = [
-        [T_VARIABLE],
-        [T_STRING],
-        [T_CONSTANT_ENCAPSED_STRING],
-        [T_LNUMBER],
-        [T_STRING, 'true'],
-        [T_STRING, 'false'],
-        '=',
-        ...self::CLASS_PROPERTY_START_CANDIDATE_SYMBOLS,
-    ];
-
     private const CLASS_PROPERTY_START_CANDIDATE_SYMBOLS = [
         [T_PRIVATE, 'private'],
         [T_PROTECTED, 'protected'],
@@ -27,11 +16,6 @@ class TokenUtils
         [T_STATIC, 'static'],
         [T_CONST, 'const'],
     ];
-
-    public static function isClassPropertyCandidateToken(Token $token): bool
-    {
-        return self::orTokenEquals($token, TokenUtils::CLASS_PROPERTY_CANDIDATE_RULE);
-    }
 
     public static function isPropertyStartTokenSymbol(Token $token): bool
     {

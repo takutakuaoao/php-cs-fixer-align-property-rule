@@ -35,7 +35,14 @@ class TextTokenTableBuilder
         $this->tablePosition = $this->tablePosition->bottomHead();
         $this->rows          = $this->tablePosition->apply($this->rows, TextToken::init($index, $text, $this->tablePosition));
 
+        $this->tablePosition = $this->tablePosition->right();
+
         return $this;
+    }
+
+    public function isEmpty(): bool
+    {
+        return [] === $this->rows;
     }
 
     public function build(): TextTokenTable

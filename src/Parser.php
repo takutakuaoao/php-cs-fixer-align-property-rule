@@ -32,20 +32,35 @@ class Parser
                 continue;
             }
 
-            if ($this->isPropertyStartToken($index, $token)) {
-                $this->addColumn($index, $token);
+            if ($this->canStartPropertySentence($index, $token)) {
+                // when inserting first row.
+                if ($this->builder->isEmpty()) {
+                    $this->addColumn($index, $token);
+                } else {
+                    $this->builder->addNewRow($index, $token->getContent());
+                }
+
                 continue;
             }
 
-            if ($this->isParsingPropertySentence) {
-                if (TokenUtils::isClassPropertyCandidateToken($token)) {
-                    $this->addColumn($index, $token);
-                    continue;
-                }
+            if ($this->canParseAsRestPropertySentence($token)) {
+                $this->addColumn($index, $token);
+
+                continue;
             }
         }
 
         return $this->builder->build();
+    }
+
+    private function canStartPropertySentence(int $index, Token $token): bool
+    {
+        return !$this->isParsingPropertySentence && $this->isPropertyStartToken($index, $token);
+    }
+
+    private function canParseAsRestPropertySentence(Token $token): bool
+    {
+        return $this->isParsingPropertySentence && !$token->equals([T_WHITESPACE]);
     }
 
     private function addColumn(int $index, Token $token): void
