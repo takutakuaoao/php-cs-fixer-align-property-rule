@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PhpCsFixerAlignPropertyRule;
+namespace PhpCsFixerAlignPropertyRule\Core;
 
 class TablePosition
 {
@@ -41,6 +41,11 @@ class TablePosition
     public function bottom(): self
     {
         return $this->update($this->row + 1, $this->column);
+    }
+
+    public function bottomHead(): self
+    {
+        return $this->update($this->row + 1, 0);
     }
 
     /**

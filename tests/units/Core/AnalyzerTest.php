@@ -2,10 +2,10 @@
 
 namespace Tests\Units;
 
-use PhpCsFixerAlignPropertyRule\Analyzer;
-use PhpCsFixerAlignPropertyRule\TablePosition;
-use PhpCsFixerAlignPropertyRule\TextToken;
-use PhpCsFixerAlignPropertyRule\TextTokenTable;
+use PhpCsFixerAlignPropertyRule\Core\Analyzer;
+use PhpCsFixerAlignPropertyRule\Core\TablePosition;
+use PhpCsFixerAlignPropertyRule\Core\TextToken;
+use PhpCsFixerAlignPropertyRule\Core\TextTokenTable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

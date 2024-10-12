@@ -2,7 +2,7 @@
 
 namespace Tests\Units;
 
-use PhpCsFixerAlignPropertyRule\Text;
+use PhpCsFixerAlignPropertyRule\Core\Text;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
