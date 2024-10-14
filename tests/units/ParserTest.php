@@ -226,6 +226,23 @@ class ParserTest extends BaseTestCase
                     [1, 5, '10'],
                 ],
             ],
+            'not_parse_static_with_function' => [
+                'code' => '<?php
+            class Test
+            {
+                public static function test()
+                {
+
+                }
+
+                static public function test2()
+                {
+
+                }
+            }
+                ',
+                'expected' => [],
+            ],
         ];
     }
 

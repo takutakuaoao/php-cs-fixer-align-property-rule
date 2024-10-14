@@ -30,6 +30,11 @@ class TokenUtils
         return ';' === $token->getContent();
     }
 
+    public static function isBreakLine(Token $token): bool
+    {
+        return false !== mb_strpos($token->getContent(), "\n");
+    }
+
     /**
      * @param array<array{0: int, 1?: string}|string> $conditions
      */
