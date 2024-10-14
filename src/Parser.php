@@ -80,25 +80,65 @@ class Parser
             return false;
         }
 
-        $prevToken = $this->tokens[$index - 1];
-
-        if (false === mb_strpos($prevToken->getContent(), "\n")) {
+        if (!$this->isStartPosition($index)) {
             return false;
         }
 
-        $nextIndex = $this->tokens->getNextNonWhitespace($index);
-
-        if (null === $nextIndex) {
-            return false;
-        }
-
-        if ($this->tokens[$nextIndex]->equals([T_FUNCTION])) {
+        if ($this->isFunctionSentence($index)) {
             return false;
         }
 
         $this->startPropertyParsing();
 
         return true;
+    }
+
+    private function isStartPosition(int $index): bool
+    {
+        $prevToken = $this->tokens[$index - 1];
+
+        return TokenUtils::isBreakLine($prevToken);
+    }
+
+    private function isFunctionSentence(int $index): bool
+    {
+        $currentIndex = $index;
+        $step         = 2;
+
+        for ($i = 0; $i < $step; ++$i) {
+            $result = $this->nextIsFunctionToken($currentIndex);
+
+            if (null === $result) {
+                return false;
+            }
+
+            if ($result['result']) {
+                return true;
+            }
+
+            $currentIndex = $result['nextIndex'];
+        }
+
+
+        return false;
+    }
+
+    /**
+     * @return array{result: bool, nextIndex: int}|null
+     */
+    private function nextIsFunctionToken(int $index): ?array
+    {
+        $nextIndex = $this->tokens->getNextNonWhitespace($index);
+
+        if (null === $nextIndex) {
+            return null;
+        }
+
+        if ($this->tokens[$nextIndex]->equals([T_FUNCTION])) {
+            return ['result' => true, 'nextIndex' => $nextIndex];
+        }
+
+        return ['result' => false, 'nextIndex' => $nextIndex];
     }
 
     private function startPropertyParsing(): void
