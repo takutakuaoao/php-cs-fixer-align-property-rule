@@ -7,12 +7,12 @@ namespace PhpCsFixerAlignPropertyRule;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixerAlignPropertyRule\Core\TextTokenTable;
-use PhpCsFixerAlignPropertyRule\Core\TextTokenTableBuilder;
+use PhpCsFixerAlignPropertyRule\Core\TextTokenTableBuilders;
 
 class Parser
 {
-    private TextTokenTableBuilder $builder;
-    private bool $isParsingPropertySentence;
+    public  TextTokenTableBuilders $builder;
+    private bool                   $isParsingPropertySentence;
 
     public static function init(Tokens $tokens): self
     {
@@ -21,11 +21,14 @@ class Parser
 
     public function __construct(public Tokens $tokens)
     {
-        $this->builder                   = TextTokenTableBuilder::init();
+        $this->builder                   = TextTokenTableBuilders::init();
         $this->isParsingPropertySentence = false;
     }
 
-    public function parse(): TextTokenTable
+    /**
+     * @return array<TextTokenTable>
+     */
+    public function parse(): array
     {
         foreach ($this->tokens as $index => $token) {
             if (null === $token) {
@@ -33,24 +36,40 @@ class Parser
             }
 
             if ($this->canStartPropertySentence($index, $token)) {
-                // when inserting first row.
-                if ($this->builder->isEmpty()) {
-                    $this->addColumn($index, $token);
-                } else {
-                    $this->builder->addNewRow($index, $token->getContent());
-                }
+                $this->builder->addNewRow($index, $token->getContent());
 
                 continue;
             }
 
             if ($this->canParseAsRestPropertySentence($token)) {
-                $this->addColumn($index, $token);
+                $this->builder->addColumn($index, $token->getContent());
+
+                $next = $this->tokens[$index + 1];
+
+                if (TokenUtils::isEndStatement($next)) {
+                    $this->endPropertyParsing();
+
+                    if ($this->isPropertyBlockEnd($index)) {
+                        $this->builder->obtainForNewPropertyBlock();
+                    }
+                }
 
                 continue;
             }
         }
 
+        if ($this->builder->isNonePropertyToken()) {
+            return [];
+        }
+
         return $this->builder->build();
+    }
+
+    private function isPropertyBlockEnd(int $index): bool
+    {
+        $endNextToken = $this->tokens[$index + 2];
+
+        return mb_substr_count($endNextToken->getContent(), "\n") >= 2;
     }
 
     private function canStartPropertySentence(int $index, Token $token): bool
@@ -61,17 +80,6 @@ class Parser
     private function canParseAsRestPropertySentence(Token $token): bool
     {
         return $this->isParsingPropertySentence && !$token->equals([T_WHITESPACE]);
-    }
-
-    private function addColumn(int $index, Token $token): void
-    {
-        $this->builder->addColumn($index, $token->getContent());
-
-        $next = $this->tokens[$index + 1];
-
-        if (TokenUtils::isEndStatement($next)) {
-            $this->endPropertyParsing();
-        }
     }
 
     private function isPropertyStartToken(int $index, Token $token): bool

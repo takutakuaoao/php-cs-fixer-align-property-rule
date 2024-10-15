@@ -8,7 +8,7 @@ class TablePosition
 {
     public static function init(): self
     {
-        return new self(0, 0);
+        return new self(-1, 0);
     }
 
     /**

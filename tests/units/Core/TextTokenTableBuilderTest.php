@@ -18,7 +18,7 @@ class TextTokenTableBuilderTest extends BaseTestCase
     {
         $result = $this->builder->addColumn(0, 'text1-1')->build();
 
-        $target = $result->findToken(TablePosition::fromArray(['row' => 0, 'column' => 0]));
+        $target = $result->findToken(TablePosition::fromArray(['row' => -1, 'column' => 0]));
         $this->assertTrue($target?->hasText('text1-1'));
     }
 
@@ -26,7 +26,7 @@ class TextTokenTableBuilderTest extends BaseTestCase
     {
         $result = $this->builder->addColumn(0, 'text-1-1')->addColumn(1, 'text-1-2')->build();
 
-        $target = $result->findToken(TablePosition::fromArray(['row' => 0, 'column' => 1]));
+        $target = $result->findToken(TablePosition::fromArray(['row' => -1, 'column' => 1]));
         $this->assertTrue($target?->hasText('text-1-2'));
     }
 
@@ -38,7 +38,7 @@ class TextTokenTableBuilderTest extends BaseTestCase
             ->addNewRow(2, 'text-2-1')
             ->build();
 
-        $target = $result->findToken(TablePosition::fromArray(['row' => 1, 'column' => 0]));
+        $target = $result->findToken(TablePosition::fromArray(['row' => 0, 'column' => 0]));
         $this->assertTrue($target?->hasText('text-2-1'));
     }
 }

@@ -30,15 +30,18 @@ class AlignClassPropertiesFixer extends AbstractFixer
 
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
-        $tokenTable = Parser::init($tokens)->parse();
-        $formatted  = Formatter::init($tokenTable)->format();
+        $tokenTables = Parser::init($tokens)->parse();
 
-        $formatted->loop(function ($_, $token) use ($tokens) {
-            if ($token->isMustAlign()) {
-                $tokens->offsetSet($token->index, new Token($token->toString()));
-                $tokens->offsetSet($token->index + 1, new Token(' '));
-            }
-        });
+        foreach ($tokenTables as $tokenTable) {
+            $formatted = Formatter::init($tokenTable)->format();
+
+            $formatted->loop(function ($_, $token) use ($tokens) {
+                if ($token->isMustAlign()) {
+                    $tokens->offsetSet($token->index, new Token($token->toString()));
+                    $tokens->offsetSet($token->index + 1, new Token(' '));
+                }
+            });
+        }
     }
 
     public function isCandidate(Tokens $tokens): bool

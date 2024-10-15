@@ -21,7 +21,7 @@ class ParserTest extends BaseTestCase
 
         $tokenTable = $parser->parse();
 
-        $this->assertTokenTable($tokenTable, $expected);
+        $this->assertTokenTable($tokenTable[0], $expected);
     }
 
     /**
@@ -226,24 +226,52 @@ class ParserTest extends BaseTestCase
                     [1, 5, '10'],
                 ],
             ],
-            'not_parse_static_with_function' => [
-                'code' => '<?php
-            class Test
-            {
-                public static function test()
-                {
-
-                }
-
-                static public function test2()
-                {
-
-                }
-            }
-                ',
-                'expected' => [],
-            ],
         ];
+    }
+
+    public function test_not_parse(): void
+    {
+        $code = '<?php
+        class Test
+        {
+            public static function test() {}
+
+            static public function test2() {}
+        }
+        ';
+
+        $result = Parser::init(Tokens::fromCode($code))->parse();
+
+        $this->assertEquals([], $result);
+    }
+
+    public function test_parse_as_multiple_property_sentences(): void
+    {
+        $code = '<?php
+        class Test
+        {
+            private $test;
+            public $test2;
+
+            protected $test3;
+            private $test4;
+        }
+        ';
+
+        $tokens = Tokens::fromCode($code);
+        $parser = Parser::init($tokens);
+
+        $result = $parser->parse();
+
+        $this->assertTokenTable($result[0], [
+            [0, 0, 'private'], [0, 1, '$test'],
+            [1, 0, 'public'], [1, 1, '$test2'],
+        ]);
+
+        $this->assertTokenTable($result[1], [
+            [0, 0, 'protected'], [0, 1, '$test3'],
+            [1, 0, 'private'], [1, 1, '$test4'],
+        ]);
     }
 
     /**
