@@ -52,8 +52,19 @@ class AlignClassPropertiesFixer extends AbstractFixer
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
-            '',
-            [new CodeSample('')],
+            'Align vertical position of class properties.',
+            [new CodeSample('<?php
+class Sample
+{
+    private string $testString;
+    public int $testInt;
+    protected bool $testBool;
+
+    readonly private string $testString2;
+    readonly public int $testInt2;
+    readonly protected bool $testBool2;
+}
+')],
             null,
             '',
         );
