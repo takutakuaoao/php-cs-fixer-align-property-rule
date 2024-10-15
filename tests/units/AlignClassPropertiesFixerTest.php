@@ -22,6 +22,11 @@ class AlignClassPropertiesFixerTest extends BaseTestCase
         {
             private int $int;
             private string $string;
+
+            private int $int2;
+            protected string $string2;
+            public bool $bool;
+
         }
         ');
 
@@ -32,6 +37,11 @@ class AlignClassPropertiesFixerTest extends BaseTestCase
         {
             private int    $int;
             private string $string;
+
+            private   int    $int2;
+            protected string $string2;
+            public    bool   $bool;
+
         }
         ', $tokens->generateCode());
     }
