@@ -1,6 +1,6 @@
 {
     "name": "takutakuaoao/php-cs-fixer-align-property-rule",
-    "description": "the cs-fixer-rule making class properties align.",
+    "description": "the cs-fixer-rule aligning vertical positions of class properties.",
     "type": "library",
     "license": "MIT",
     "autoload": {
